@@ -3,6 +3,7 @@ use crate::station::StationManager;
 use crate::tui::{Event, Tui};
 use anyhow::Result;
 use crossbeam_channel::select;
+use ratatui::widgets::ListState; //+ ADDED
 use std::{collections::HashMap, io, thread, time::Duration};
 use termion::input::TermRead;
 
@@ -15,17 +16,22 @@ pub struct App {
     pub focused_panel: FocusedPanel,
     pub station_manager: StationManager,
     pub history: HashMap<String, Vec<(String, String)>>,
+    //+ CHANGED: We now use ListState to manage the view.
+    pub history_list_state: ListState,
 }
 
 impl App {
     pub fn new() -> Result<Self> {
-        // Mock history data for demonstration purposes.
         let mut history = HashMap::new();
         history.insert(
             "ILove2Dance".to_string(),
             vec![
                 ("14:30:15".to_string(), "Artist - Song Title".to_string()),
                 ("14:33:42".to_string(), "Another Artist - Another Song".to_string()),
+                ("14:37:01".to_string(), "Third Song - By A Band".to_string()),
+                ("14:40:22".to_string(), "A Classic Hit - Old Timer".to_string()),
+                ("14:44:56".to_string(), "Electronic Beat - Producer".to_string()),
+                ("14:48:19".to_string(), "Something New - Fresh Artist".to_string()),
             ],
         );
         history.insert(
@@ -42,6 +48,8 @@ impl App {
             focused_panel: FocusedPanel::Stations,
             station_manager: StationManager::new()?,
             history,
+            //+ ADDED: Initialize the ListState.
+            history_list_state: ListState::default(),
         })
     }
 
