@@ -3,7 +3,7 @@ use crate::station::StationManager;
 use crate::tui::{Event, Tui};
 use anyhow::Result;
 use crossbeam_channel::select;
-use std::{io, thread, time::Duration};
+use std::{collections::HashMap, io, thread, time::Duration};
 use termion::input::TermRead;
 
 pub enum AppMode { Normal, Discovery, Copy }
@@ -14,15 +14,34 @@ pub struct App {
     pub mode: AppMode,
     pub focused_panel: FocusedPanel,
     pub station_manager: StationManager,
+    pub history: HashMap<String, Vec<(String, String)>>,
 }
 
 impl App {
     pub fn new() -> Result<Self> {
+        // Mock history data for demonstration purposes.
+        let mut history = HashMap::new();
+        history.insert(
+            "ILove2Dance".to_string(),
+            vec![
+                ("14:30:15".to_string(), "Artist - Song Title".to_string()),
+                ("14:33:42".to_string(), "Another Artist - Another Song".to_string()),
+            ],
+        );
+        history.insert(
+            "RM Deutschrap".to_string(),
+            vec![
+                ("15:01:00".to_string(), "Rapper - Track One".to_string()),
+                ("15:04:12".to_string(), "Rapper Two - Feature Track".to_string()),
+            ],
+        );
+
         Ok(Self {
             should_quit: false,
             mode: AppMode::Normal,
             focused_panel: FocusedPanel::Stations,
             station_manager: StationManager::new()?,
+            history,
         })
     }
 
